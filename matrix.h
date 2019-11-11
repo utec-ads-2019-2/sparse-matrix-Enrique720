@@ -10,11 +10,11 @@ using namespace std;
 template <typename T>
 class Matrix {
 private:
-	vector <Header<T>*>* x;
+    vector <Header<T>*>* x;
     vector <Header<T>*>* y;
     unsigned const rows, columns;
 
-    Node<T>* findNode(unsigned pX, unsigned pY){
+    Node<T>* findNode(unsigned pY, unsigned pX){
         Node<T>* temp = ((*y)[pY])->next;
         if(temp)
             while(temp)
@@ -28,7 +28,7 @@ private:
 
     }
 
-    Node<T>* findLeft(unsigned pX, unsigned pY){
+    Node<T>* findLeft(unsigned pY, unsigned pX){
         Node<T>* temp = ((*y)[pY])->next;
         if(temp){
             if(temp->posX >= pX)
@@ -47,28 +47,28 @@ private:
         return nullptr;
 
     }
-   Node<T>* findTop(unsigned pX, unsigned pY){
-       Node<T>* temp = ((*x)[pX])->next;
-       if(temp){
-           if(temp->posY >= pY){
-               return nullptr;}
-           if(temp->down){
-               while(temp->down){
-                   if(temp->down->posY >= pY){
-                       return temp;
-                   }
-                   else{
-                       temp=temp->down;
-                   }
-               }
-           }
-           return temp;
-       }
-       return nullptr;
-   }
+    Node<T>* findTop(unsigned pY, unsigned pX){
+        Node<T>* temp = ((*x)[pX])->next;
+        if(temp){
+            if(temp->posY >= pY){
+                return nullptr;}
+            if(temp->down){
+                while(temp->down){
+                    if(temp->down->posY >= pY){
+                        return temp;
+                    }
+                    else{
+                        temp=temp->down;
+                    }
+                }
+            }
+            return temp;
+        }
+        return nullptr;
+    }
 
 public:
-	Matrix(unsigned _rows, unsigned _columns):rows{_rows} , columns{_columns} {
+    Matrix(unsigned _rows, unsigned _columns):rows{_rows} , columns{_columns} {
         x = new vector<Header<T>*>;
         y = new vector<Header<T>*>;
         int i;
@@ -79,21 +79,21 @@ public:
             (*y).emplace_back(new Header<T>);
         }
 
-	}
-	bool remove(unsigned pX , unsigned pY){
-        auto temp = findNode(pX,pY);
+    }
+    bool remove(unsigned ppY , unsigned ppX){
+        auto temp = findNode(ppY,ppX);
         if(temp){
-            auto temptop = findTop(pX,pY);
-            auto templeft = findLeft(pX,pY);
+            auto temptop = findTop(ppY,ppX);
+            auto templeft = findLeft(ppY,ppX);
             if(!temptop){
-                Header<T>* t = (*x)[pX];
+                Header<T>* t = (*x)[ppX];
                 t->next = temp->down;
             }
             else{
                 temptop->down = temp->down;
             }
             if(!temptop){
-                Header<T>* t = (*y)[pY];
+                Header<T>* t = (*y)[ppY];
                 t->next = temp->right;
             }
             else{
@@ -104,16 +104,16 @@ public:
         }
         return false;
     }
-    bool set(unsigned pX , unsigned pY, T data){
-        auto temp = findNode(pX,pY);
+    bool set(unsigned ppY , unsigned ppX, T data){
+        auto temp = findNode(ppY,ppX);
         if(!temp){
             if(data == 0)
                 return false;
-            auto arriba = findTop(pX,pY);
-            auto izquierda = findLeft(pX,pY);
-            auto newNode = new Node<T>(pX,pY,data);
+            auto arriba = findTop(ppY,ppX);
+            auto izquierda = findLeft(ppY,ppX);
+            auto newNode = new Node<T>(ppY,ppX,data);
             if(!arriba){
-                Header<T>* t = ((*x)[pX]);
+                Header<T>* t = ((*x)[ppX]);
                 newNode->down = t->next;
                 t->next = newNode;
             }
@@ -123,7 +123,7 @@ public:
 
             }
             if(!izquierda){
-                Header<T>* t2 = ((*y)[pY]);
+                Header<T>* t2 = ((*y)[ppY]);
                 newNode->right = t2->next;
                 t2->next = newNode;
             }
@@ -136,17 +136,17 @@ public:
         }
         else{
             if(data == 0){
-                remove(pX,pY);
+                remove(ppY,ppX);
             }
             else{
                 temp->data = data;
             }
             return true;
         }
-	}
+    }
 
 
-    T operator()(unsigned _x, unsigned _y)const {
+    T operator()(unsigned _y, unsigned _x)const {
         Node<T>* temp = ((*y)[_y])->next;
         if(temp)
             while(temp)
@@ -158,39 +158,53 @@ public:
             }
         return 0;
     }
-     Matrix<T> operator*(T scalar) const{
-            auto matrix = new Matrix<T>(rows,columns);
-            for(int i = 0; i < rows ; i++){
-                for(int j = 0; j < columns; j++){
-                    matrix->set(i,j,(operator()(i,j))*scalar);
-                }
+    Matrix<T> operator*(T scalar) const{
+        auto matrix = new Matrix<T>(rows,columns);
+        for(int i = 0; i < rows ; i++){
+            for(int j = 0; j < columns; j++){
+                matrix->set(i,j,(operator()(i,j))*scalar);
             }
-            return *matrix;
+        }
+        return *matrix;
     }
 
-    //  Matrix<T> operator*(Matrix<T> other) const;
+    Matrix<T> operator*(Matrix<T> other) const{
+        if(other.rows != columns )
+            throw new out_of_range("Matrices no se pueden multiplicar");
+        auto matrix = new Matrix<T>(rows,other.columns);
 
-      Matrix<T> operator+(Matrix<T> other) const{
-            if(other.rows != rows || other.columns != columns )
-                throw new out_of_range("Matrices de diferente tamaño");
-            auto matrix = new Matrix<T>(rows,columns);
-            for(int i = 0; i < rows; i++){
-                for(int j= 0; j< columns ; j++){
-                    matrix->set(i,j,operator()(i,j) + other.operator()(i,j));
-                }
+        for(int i=0; i<rows; ++i) {
+            for (int j = 0; j < other.columns; ++j) {
+                T cont = 0;
+                for (int z = 0; z < columns; ++z)
+                    cont += operator()(i, z) * other.operator()(z, j);
+                matrix->set(i,j,cont);
             }
-            return *matrix;
+        }
+        return *matrix;
     }
-      Matrix<T> operator-(Matrix<T> other) const{
-          if(other.rows != rows || other.columns != columns )
-              throw new out_of_range("Matrices de diferente tamaño");
-          auto matrix = new Matrix<T>(rows,columns);
-          for(int i = 0; i < rows; i++){
-              for(int j= 0; j< columns ; j++){
-                  matrix->set(i,j,operator()(i,j) - other.operator()(i,j));
-              }
-          }
-          return *matrix;
+
+    Matrix<T> operator+(Matrix<T> other) const{
+        if(other.rows != rows || other.columns != columns )
+            throw new out_of_range("Matrices de diferente tamaño");
+        auto matrix = new Matrix<T>(rows,columns);
+        for(int i = 0; i < rows; i++){
+            for(int j= 0; j< columns ; j++){
+                matrix->set(i,j,operator()(i,j) + other.operator()(i,j));
+            }
+        }
+        return *matrix;
+    }
+    Matrix<T> operator-(Matrix<T> other) const{
+        if(other.rows != rows || other.columns != columns )
+            throw new out_of_range("Matrices de diferente tamaño");
+        auto matrix = new Matrix<T>(rows,columns);
+        for(int i = 0; i < rows; i++){
+            for(int j= 0; j< columns ; j++){
+                matrix->set(i,j,operator()(i,j) - other.operator()(i,j));
+            }
+        }
+        return *matrix;
     }
     Matrix<T> transpose() const{
         auto matrix = new Matrix<T>(columns,rows);
@@ -208,25 +222,20 @@ public:
         int cont= 0;
         for(auto it = y->cbegin() ; it != y->cend() ; it++){
             auto temp = (*it)->next;
-                while (temp) {
-                    while (cont++ < temp->posX) {
-                        cout << setw(4);
-                        cout << 0 << " ";
-                    }
-                    cout << setw(4);
-                    cout << temp->data << " ";
-                    temp = temp->right;
-                }
-                while (cont++ < columns){
-                    cout << setw(4);
-                    cout << 0 <<  " " ;
-                }
-                cont = 0;
-                cout << endl;
-
+            while (temp) {
+                while (cont++ < temp->posX)
+                    cout << setw(4) << 0 << " ";
+                cout << setw(4) << temp->data << " ";
+                temp = temp->right;
+            }
+            while (cont++ < columns){
+                cout << setw(4)<< 0 <<  " " ;
+            }
+            cont = 0;
+            cout << endl;
         }
     }
-	
+
     //~Matrix();
 
 };

@@ -1,4 +1,4 @@
-#ifndef SPARSE_MATRIX_NODE_H
+#ifndef SPARSE<_MATRIX_NODE_H
 #define SPARSE_MATRIX_NODE_H
 
 template <typename T>
@@ -13,7 +13,7 @@ protected:
 	int posY;
 public:
 	explicit Node() : data{ 0 },posX { 0 }, posY{ 0 }, right{ nullptr }, down{ nullptr } {}
-	explicit Node(int x, int y, T _data) {
+	explicit Node(int y, int x, T _data) {
 		data = _data;
 		posX = x;
 		posY = y;
