@@ -141,7 +141,6 @@ public:
 	}
 
 
-
     T operator()(unsigned _x, unsigned _y)const {
         Node<T>* temp = ((*y)[_y])->next;
         if(temp)
@@ -154,12 +153,42 @@ public:
             }
         return 0;
     }
-    /* Matrix<T> operator*(T scalar) const;
-      Matrix<T> operator*(Matrix<T> other) const;
-      Matrix<T> operator+(Matrix<T> other) const;
-      Matrix<T> operator-(Matrix<T> other) const;
-      Matrix<T> transpose() const;
-      */
+     Matrix<T> operator*(T scalar) const{
+            auto matrix = new Matrix<T>(rows,columns);
+            for(int i = 0; i < rows ; i++){
+                for(int j = 0; j < columns; j++){
+                    matrix->set(i,j,(operator()(i,j))*scalar);
+                }
+            }
+            return *matrix;
+    }
+
+    //  Matrix<T> operator*(Matrix<T> other) const;
+
+      Matrix<T> operator+(Matrix<T> other) const{
+            if(other.rows != rows || other.columns != columns )
+                throw new out_of_range("Matrices de diferente tamaño");
+            auto matrix = new Matrix<T>(rows,columns);
+            for(int i = 0; i < rows; i++){
+                for(int j= 0; j< columns ; j++){
+                    matrix->set(i,j,operator()(i,j) + other.operator()(i,j));
+                }
+            }
+            return *matrix;
+    }
+      Matrix<T> operator-(Matrix<T> other) const{
+          if(other.rows != rows || other.columns != columns )
+              throw new out_of_range("Matrices de diferente tamaño");
+          auto matrix = new Matrix<T>(rows,columns);
+          for(int i = 0; i < rows; i++){
+              for(int j= 0; j< columns ; j++){
+                  matrix->set(i,j,operator()(i,j) - other.operator()(i,j));
+              }
+          }
+          return *matrix;
+    }
+    /*   Matrix<T> transpose() const;
+       */
 
     void print() const{
         int i;
