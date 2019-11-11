@@ -1,4 +1,4 @@
-#ifndef SPARSE<_MATRIX_NODE_H
+#ifndef SPARSE_MATRIX_NODE_H
 #define SPARSE_MATRIX_NODE_H
 
 template <typename T>

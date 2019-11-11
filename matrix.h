@@ -168,7 +168,7 @@ public:
         return *matrix;
     }
 
-    Matrix<T> operator*(Matrix<T> other) const{
+    Matrix<T> operator*(Matrix<T>& other) const{
         if(other.rows != columns )
             throw new out_of_range("Matrices no se pueden multiplicar");
         auto matrix = new Matrix<T>(rows,other.columns);
@@ -184,7 +184,7 @@ public:
         return *matrix;
     }
 
-    Matrix<T> operator+(Matrix<T> other) const{
+    Matrix<T> operator+(Matrix<T>& other) const{
         if(other.rows != rows || other.columns != columns )
             throw new out_of_range("Matrices de diferente tamaño");
         auto matrix = new Matrix<T>(rows,columns);
@@ -195,7 +195,8 @@ public:
         }
         return *matrix;
     }
-    Matrix<T> operator-(Matrix<T> other) const{
+
+    Matrix<T> operator-(Matrix<T>& other) const{
         if(other.rows != rows || other.columns != columns )
             throw new out_of_range("Matrices de diferente tamaño");
         auto matrix = new Matrix<T>(rows,columns);
@@ -206,6 +207,16 @@ public:
         }
         return *matrix;
     }
+    Matrix<T>& operator=(Matrix<T> other){
+        for(int i = 0; i < other.rows; i++ ){
+            for(int j = 0; j < other.columns ; j++){
+                this->set(i,j,other.operator()(i,j));
+            }
+        }
+        return *this;
+    }
+
+
     Matrix<T> transpose() const{
         auto matrix = new Matrix<T>(columns,rows);
         for(int i  = 0; i < rows ; i++){
@@ -236,8 +247,17 @@ public:
         }
     }
 
-    //~Matrix();
-
+    ~Matrix(){
+        for(int i = 0; i < rows; i ++){
+            for(int j = 0; j < columns; j++){
+                remove(i,j);
+            }
+        }
+        x->clear();
+        y->clear();
+        delete x;
+        delete y;
+    }
 };
 
 #endif //SPARSE_MATRIX_MATRIX_H
