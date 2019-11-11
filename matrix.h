@@ -135,7 +135,12 @@ public:
             return true;
         }
         else{
-            temp->data = data;
+            if(data == 0){
+                remove(pX,pY);
+            }
+            else{
+                temp->data = data;
+            }
             return true;
         }
 	}
@@ -187,8 +192,16 @@ public:
           }
           return *matrix;
     }
-    /*   Matrix<T> transpose() const;
-       */
+    Matrix<T> transpose() const{
+        auto matrix = new Matrix<T>(columns,rows);
+        for(int i  = 0; i < rows ; i++){
+            for(int j = 0; j < columns ; j++){
+                matrix->set(j,i,operator()(i,j));
+            }
+        }
+        return *matrix;
+    }
+
 
     void print() const{
         int i;
