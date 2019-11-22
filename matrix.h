@@ -168,6 +168,8 @@ public:
         return *matrix;
     }
 
+    // Trabajar directamente con los operadores va a ser que tu procesamiento sea más lento
+
     Matrix<T> operator*(Matrix<T>& other) const{
         if(other.rows != columns )
             throw new out_of_range("Matrices no se pueden multiplicar");
@@ -247,6 +249,7 @@ public:
         }
     }
 
+    // Al implementar el destructor, necesitas un constructor copia y el operator =
     ~Matrix(){
         for(int i = 0; i < rows; i ++){
             for(int j = 0; j < columns; j++){
